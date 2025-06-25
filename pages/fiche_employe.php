@@ -1,28 +1,20 @@
 <?php
-include '../inc/connection.php';
+include '../inc/function.php';
 
-$emp_no = $_GET['emp_no'] ?? '';
+$emp_no = $_GET['emp_no'] ?? null;
 
-$employee_query = "SELECT * FROM employees WHERE emp_no = $emp_no";
-$employee_result = mysqli_query($dataBase, $employee_query);
-$employee = mysqli_fetch_assoc($employee_result);
+if (!$emp_no || !is_numeric($emp_no)) {
+    die('Numéro employé invalide.');
+}
 
-$salaries_query = "SELECT * FROM salaries WHERE emp_no = $emp_no ORDER BY from_date DESC";
-$salaries_result = mysqli_query($dataBase, $salaries_query);
+$data = getFicheEmploye($dataBase, (int)$emp_no);
+$employee = $data['employee'];
+$salaries = $data['salaries'];
+$titles = $data['titles'];
+$current_dept = $data['current_dept'];
 
-
-$titles_query = "SELECT * FROM titles WHERE emp_no = $emp_no ORDER BY from_date DESC";
-$titles_result = mysqli_query($dataBase, $titles_query);
-
-$current_dept_query = "
-    SELECT d.dept_no, d.dept_name 
-    FROM departments d
-    JOIN dept_emp de ON d.dept_no = de.dept_no
-    WHERE de.emp_no = $emp_no AND de.to_date > NOW()
-";
-$current_dept_result = mysqli_query($dataBase, $current_dept_query);
-$current_dept = mysqli_fetch_assoc($current_dept_result);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -63,7 +55,8 @@ $current_dept = mysqli_fetch_assoc($current_dept_result);
             <div class="card mb-4">
                 <div class="card-header bg-secondary text-white">Historique des salaires</div>
                 <div class="card-body">
-                    <?php if (mysqli_num_rows($salaries_result) > 0): ?>
+                    <?php if (count($salaries) > 0): ?>
+
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead class="table-light">
@@ -74,13 +67,14 @@ $current_dept = mysqli_fetch_assoc($current_dept_result);
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while ($salary = mysqli_fetch_assoc($salaries_result)): ?>
+                                <?php foreach ($salaries as $salary): ?>
+
                                 <tr>
                                     <td><?= $salary['salary'] ?> $</td>
                                     <td><?= $salary['from_date'] ?></td>
                                     <td><?= $salary['to_date'] ?></td>
                                 </tr>
-                                <?php endwhile; ?>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
@@ -93,7 +87,7 @@ $current_dept = mysqli_fetch_assoc($current_dept_result);
             <div class="card mb-4">
                 <div class="card-header bg-success text-white">Historique des postes</div>
                 <div class="card-body">
-                    <?php if (mysqli_num_rows($titles_result) > 0): ?>
+                    <?php if (count($titles) > 0): ?>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead class="table-light">
@@ -104,13 +98,14 @@ $current_dept = mysqli_fetch_assoc($current_dept_result);
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while ($title = mysqli_fetch_assoc($titles_result)): ?>
+                                <?php foreach ($titles as $title): ?>
+
                                 <tr>
                                     <td><?= $title['title'] ?></td>
                                     <td><?= $title['from_date'] ?></td>
                                     <td><?= $title['to_date'] ?></td>
                                 </tr>
-                                <?php endwhile; ?>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>

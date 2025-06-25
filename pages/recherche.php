@@ -1,48 +1,20 @@
 <?php
-include '../inc/connection.php';
+include '../inc/function.php';
 
 $dept_no = $_GET['dept_no'] ?? '';
 $nom_employe = $_GET['nom_employe'] ?? '';
 $age_min = $_GET['age_min'] ?? '';
 $age_max = $_GET['age_max'] ?? '';
-$page = $_GET['page'] ?? 0;
+$page = (int)($_GET['page'] ?? 0);
 $offset = $page * 20;
 
-$query = "
-    SELECT e.emp_no, e.first_name, e.last_name, e.birth_date, e.hire_date, d.dept_name
-    FROM employees e
-    LEFT JOIN dept_emp de ON e.emp_no = de.emp_no AND de.to_date > NOW()
-    LEFT JOIN departments d ON de.dept_no = d.dept_no
-    WHERE 1=1
-";
+$criteres = compact('dept_no', 'nom_employe', 'age_min', 'age_max');
+$data = rechercherEmployes($dataBase, $criteres, $offset);
+$employees = $data['employees'];
+$total_employees = $data['total'];
 
-if (!empty($dept_no)) {
-    $query .= " AND de.dept_no = '$dept_no'";
-}
+$departments = getAllDepartments($dataBase);
 
-if (!empty($nom_employe)) {
-    $query .= " AND (e.last_name LIKE '%$nom_employe%' OR e.first_name LIKE '%$nom_employe%')";
-}
-
-if (!empty($age_min)) {
-    $query .= " AND TIMESTAMPDIFF(YEAR, e.birth_date, CURDATE()) >= $age_min";
-}
-
-if (!empty($age_max)) {
-    $query .= " AND TIMESTAMPDIFF(YEAR, e.birth_date, CURDATE()) <= $age_max";
-}
-
-$query .= " ORDER BY e.last_name, e.first_name LIMIT $offset, 20";
-
-$result = mysqli_query($dataBase, $query);
-
-$count_query = preg_replace('/LIMIT \d+, \d+/', '', $query);
-$count_query = "SELECT COUNT(*) as total FROM ($count_query) as subquery";
-$count_result = mysqli_query($dataBase, $count_query);
-$total_employees = mysqli_fetch_assoc($count_result)['total'];
-
-$departments_query = "SELECT dept_no, dept_name FROM departments ORDER BY dept_name";
-$departments_result = mysqli_query($dataBase, $departments_query);
 ?>
 
 <!DOCTYPE html>
@@ -67,11 +39,12 @@ $departments_result = mysqli_query($dataBase, $departments_query);
                     <label for="dept_no" class="form-label">Département</label>
                     <select class="form-select" name="dept_no" id="dept_no">
                         <option value="">Tous les départements</option>
-                        <?php while ($dept = mysqli_fetch_assoc($departments_result)): ?>
+                        <?php foreach ($departments as $dept): ?>
+
                         <option value="<?= $dept['dept_no'] ?>" <?= $dept_no == $dept['dept_no'] ? 'selected' : '' ?>>
                             <?= $dept['dept_name'] ?>
                         </option>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
@@ -95,7 +68,8 @@ $departments_result = mysqli_query($dataBase, $departments_query);
                 </div>
             </form>
 
-            <?php if (mysqli_num_rows($result) > 0): ?>
+            <?php if (count($employees) > 0): ?>
+
             <div class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <thead class="table-light">
@@ -110,7 +84,8 @@ $departments_result = mysqli_query($dataBase, $departments_query);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($employee = mysqli_fetch_assoc($result)): ?>
+                        <?php foreach ($employees as $employee): ?>
+
                         <tr>
                             <td><?= $employee['emp_no'] ?></td>
                             <td><?= $employee['last_name'] ?></td>
@@ -125,7 +100,7 @@ $departments_result = mysqli_query($dataBase, $departments_query);
                                 </form>
                             </td>
                         </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
