@@ -12,7 +12,7 @@ $query = "
 
 $result = mysqli_query($dataBase, $query);
 ?>
-
+/*skhfizfiez*/
 <!DOCTYPE html>
 <html lang="fr">
 <head>
