@@ -109,6 +109,7 @@ CREATE OR REPLACE VIEW current_dept_emp AS
 
 flush /*!50503 binary */ logs;
 
+/* correction 
 SELECT 'LOADING departments' as 'INFO';
 source load_departments.dump ;
 SELECT 'LOADING employees' as 'INFO';
@@ -124,7 +125,7 @@ source load_salaries1.dump ;
 source load_salaries2.dump ;
 source load_salaries3.dump ;
 
-/* correction 
+*/
 
 SELECT 'LOADING departments' as 'INFO';
 source /opt/lampp/htdocs/test_db-master/load_departments.dump ;
@@ -142,6 +143,6 @@ source /opt/lampp/htdocs/test_db-master/load_salaries2.dump ;
 source /opt/lampp/htdocs/test_db-master/load_salaries3.dump ;
 source /opt/lampp/htdocs/test_db-master/show_elapsed.sql ;
 
-*/
+
 
 source show_elapsed.sql ;
