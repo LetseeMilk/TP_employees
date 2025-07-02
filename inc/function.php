@@ -5,8 +5,8 @@ function afficherDepartements(mysqli $db) {
     $query = "
         SELECT d.dept_no, d.dept_name, e.first_name, e.last_name
         FROM departments d
-        LEFT JOIN dept_manager dm ON d.dept_no = dm.dept_no 
-        LEFT JOIN employees e ON dm.emp_no = e.emp_no
+        JOIN dept_manager dm ON d.dept_no = dm.dept_no 
+        JOIN employees e ON dm.emp_no = e.emp_no
         WHERE dm.to_date > NOW()
         ORDER BY d.dept_name
     ";
@@ -134,8 +134,8 @@ function rechercherEmployes(mysqli $db, array $criteres, int $offset = 0): array
     $query = "
         SELECT e.emp_no, e.first_name, e.last_name, e.birth_date, e.hire_date, d.dept_name
         FROM employees e
-        LEFT JOIN dept_emp de ON e.emp_no = de.emp_no AND de.to_date > NOW()
-        LEFT JOIN departments d ON de.dept_no = d.dept_no
+        JOIN dept_emp de ON e.emp_no = de.emp_no AND de.to_date > NOW()
+        JOIN departments d ON de.dept_no = d.dept_no
         WHERE 1=1
     ";
 
