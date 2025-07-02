@@ -50,7 +50,6 @@ function afficherDepartements(mysqli $db) {
     echo '</tbody></table></div>';
 }
 function getEmployesParDepartement(mysqli $db, string $dept_no, int $page = 0): array {
-    $offset = $page * 20;
 
     $dept_query = "SELECT dept_name FROM departments WHERE dept_no = '$dept_no'";
     $dept_result = mysqli_query($db, $dept_query);
@@ -62,7 +61,7 @@ function getEmployesParDepartement(mysqli $db, string $dept_no, int $page = 0): 
         JOIN dept_emp de ON e.emp_no = de.emp_no
         WHERE de.dept_no = '$dept_no' AND de.to_date > NOW()
         ORDER BY e.last_name, e.first_name
-        LIMIT $offset, 20
+        LIMIT 0, 20
     ";
     $employees_result = mysqli_query($db, $employees_query);
     
