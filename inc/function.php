@@ -1,7 +1,7 @@
 <?php
 require 'connection.php';
 
-function afficherDepartements(mysqli $db) {
+function afficherDepartements(mysqli $db): array {
     $query = "
         SELECT d.dept_no, d.dept_name, e.first_name, e.last_name
         FROM departments d
@@ -10,44 +10,15 @@ function afficherDepartements(mysqli $db) {
         WHERE dm.to_date > NOW()
         ORDER BY d.dept_name
     ";
-    
     $result = mysqli_query($db, $query);
 
-    if (!$result) {
-        echo "<p class='text-danger'>Erreur de chargement des départements.</p>";
-        return;
+    $departements = [];
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $departements[] = $row;
+        }
     }
-
-    echo '<div class="table-responsive">';
-    echo '<table class="table table-bordered table-striped align-middle">';
-    echo '<thead class="table-light">
-            <tr>
-                <th>Numéro</th>
-                <th>Nom du département</th>
-                <th>Manager actuel</th>
-                <th>Actions</th>
-            </tr>
-          </thead>';
-    echo '<tbody>';
-
-    while ($row = mysqli_fetch_assoc($result)) {
-        $manager = trim($row['first_name'] . ' ' . $row['last_name']);
-        if ($manager === '') $manager = 'Non défini';
-
-        echo '<tr>';
-        echo '<td>' . $row['dept_no'] . '</td>';
-        echo '<td>' . $row['dept_name'] . '</td>';
-        echo '<td>' . $manager . '</td>';
-        echo '<td>
-                <form action="pages/employes_departement.php" method="get" class="d-inline">
-                    <input type="hidden" name="dept_no" value="' . $row['dept_no'] . '">
-                    <button type="submit" class="btn btn-outline-primary btn-sm">Voir les employés</button>
-                </form>
-              </td>';
-        echo '</tr>';
-    }
-
-    echo '</tbody></table></div>';
+    return $departements;
 }
 function getEmployesParDepartement(mysqli $db, string $dept_no, int $page = 0): array {
 
