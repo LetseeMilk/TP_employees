@@ -33,24 +33,30 @@ $current_dept = $data['current_dept'];
 
         <main>
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">Informations personnelles</div>
-                <div class="card-body">
-                    <p><strong>Numéro :</strong> <?= $employee['emp_no'] ?></p>
-                    <p><strong>Nom :</strong> <?= $employee['last_name'] ?></p>
-                    <p><strong>Prénom :</strong> <?= $employee['first_name'] ?></p>
-                    <p><strong>Date de naissance :</strong> <?= $employee['birth_date'] ?></p>
-                    <p><strong>Genre :</strong> <?= $employee['gender'] ?></p>
-                    <p><strong>Date d'embauche :</strong> <?= $employee['hire_date'] ?></p>
-                    <?php if ($current_dept): ?>
-                    <p><strong>Département actuel :</strong>
-                        <form action="employes_departement.php" method="get" class="d-inline">
-                            <input type="hidden" name="dept_no" value="<?= $current_dept['dept_no'] ?>">
-                            <button type="submit" class="btn btn-link p-0 m-0 align-baseline"><?= $current_dept['dept_name'] ?></button>
-                        </form>
-                    </p>
-                    <?php endif; ?>
-                </div>
-            </div>
+                
+    <div class="card-header bg-primary text-white">Informations personnelles</div>
+    <div class="card-body">
+        <p><strong>Numéro :</strong> <?= $employee['emp_no'] ?></p>
+        <p><strong>Nom :</strong> <?= $employee['last_name'] ?></p>
+        <p><strong>Prénom :</strong> <?= $employee['first_name'] ?></p>
+        <p><strong>Date de naissance :</strong> <?= $employee['birth_date'] ?></p>
+        <p><strong>Genre :</strong> <?= $employee['gender'] ?></p>
+        <p><strong>Date d'embauche :</strong> <?= $employee['hire_date'] ?></p>
+        <?php if ($current_dept): ?>
+        <p><strong>Département actuel :</strong>
+            <form action="employes_departement.php" method="get" class="d-inline">
+                <input type="hidden" name="dept_no" value="<?= $current_dept['dept_no'] ?>">
+                <button type="submit" class="btn btn-link p-0 m-0 align-baseline"><?= $current_dept['dept_name'] ?></button>
+            </form>
+        </p>
+        <?php endif; ?>
+        <?php if (!empty($data['longest_title'])): ?>
+        <p><strong>Emploi le plus long :</strong> 
+            <?= htmlspecialchars($data['longest_title']['title']) ?> 
+        </p>
+        <?php endif; ?>
+    </div>
+</div>
 
             <div class="card mb-4">
                 <div class="card-header bg-secondary text-white">Historique des salaires</div>
