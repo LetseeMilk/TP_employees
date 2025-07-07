@@ -21,7 +21,7 @@ $current_dept = $data['current_dept'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiche employé <?= htmlspecialchars($employee['first_name'] . ' ' . $employee['last_name']) ?></title>
+    <title>Fiche employé <?= ($employee['first_name'] . ' ' . $employee['last_name']) ?></title>
    <link href="../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -52,7 +52,7 @@ $current_dept = $data['current_dept'];
         <?php endif; ?>
         <?php if (!empty($data['longest_title'])): ?>
         <p><strong>Emploi le plus long :</strong> 
-            <?= htmlspecialchars($data['longest_title']['title']) ?> 
+            <?= ($data['longest_title']['title']) ?> 
         </p>
         <?php endif; ?>
     </div>
