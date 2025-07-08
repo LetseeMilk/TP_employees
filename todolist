@@ -1,0 +1,20 @@
+Version 1
+. Créer une page qui affiche la liste des départements
+. Rajouter une colonne qui affiche le nom du manager en cours
+. Mettre un lien sur chaque ligne de département pour afficher dans une autre page la liste des
+employés de ce département.
+
+Version 2
+. Lorsqu'on clique sur un employé, on doit afficher la fiche de l'employé
+. Rajouter l'historique du salaire et de l'emploi occupe dans la fiche,
+. Créer un formulaire de recherche ( departement, nom employé, age min et max )
+. Afficher seulement 20 lignes (utiliser LIMIT en SQL )
+. Créer un lien suivant pour afficher les 20 prochaines lignes
+. Créer un lien précédent pour afficher les 20 lignes précédentes
+
+Version 3
+. Créer un lien suivant pour afficher les 20 prochaines lignes
+. Créer un lien précédent pour afficher les 20 lignes précédentes
+. Créer une page pour afficher un tableau contenant le nombre d'employé (homme et femme ), et le
+salaire moyen pour chaque emploi
+. Dans la fiche employé, mettre l'emploi le plus long (en terme de date)

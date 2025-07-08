@@ -18,8 +18,11 @@ function getEmployesParDepartement(mysqli $db, string $dept_no, int $page = 0): 
    
     $dept_result = mysqli_query($db, "SELECT dept_name FROM departments WHERE dept_no = '$dept_no'");
     $dept_info = mysqli_fetch_assoc($dept_result);
-    $dept_name = $dept_info['dept_name'] ?? 'Inconnu';
-
+    if (isset($dept_info['dept_name'])) {
+    $dept_name = $dept_info['dept_name'];
+    } else {
+        $dept_name = 'Inconnu';
+    }
 
     $query = "
         SELECT emp_no, first_name, last_name, hire_date
@@ -86,16 +89,32 @@ function getFicheEmploye(mysqli $db, int $emp_no): array {
     ");
     $longest_title = mysqli_fetch_assoc($longest_title_result);
 
+    $dept_no = null;
+    $dept_name = null;
+
+    if (isset($employee['dept_no'])) {
+        $dept_no = $employee['dept_no'];
+    } else {
+        $dept_no = null;
+    }
+
+    if (isset($employee['dept_name'])) {
+        $dept_name = $employee['dept_name'];
+    } else {
+        $dept_name = null;
+    }
+
     return [
         'employee' => $employee,
         'salaries' => $salaries,
         'titles' => $titles,
         'current_dept' => [
-            'dept_no' => $employee['dept_no'] ?? null,
-            'dept_name' => $employee['dept_name'] ?? null,
+            'dept_no' => $dept_no,
+            'dept_name' => $dept_name,
         ],
         'longest_title' => $longest_title,
     ];
+
 }
 
 function rechercherEmployes(mysqli $db, array $criteres, int $offset = 0): array {
