@@ -1,4 +1,5 @@
 <?php
+session_start();
 include '../inc/function.php';
 
 $emp_no = $_GET['emp_no'] ?? null;
@@ -31,6 +32,24 @@ $current_dept = $data['current_dept'];
             <h1 class="fw-bold">Fiche employé</h1>
         </header>
 
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <?= $_SESSION['error'] ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <?php unset($_SESSION['error']); endif; ?>
+                
+                <?php if (isset($_SESSION['success'])): ?>
+                <div class="alert alert-success alert-dismissible fade show">
+                    <?= $_SESSION['success'] ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <?php unset($_SESSION['success']); endif; ?>
+            </div>
+        </div>
+
         <main>
             <div class="card mb-4">
                 
@@ -42,17 +61,15 @@ $current_dept = $data['current_dept'];
         <p><strong>Date de naissance :</strong> <?= $employee['birth_date'] ?></p>
         <p><strong>Genre :</strong> <?= $employee['gender'] ?></p>
         <p><strong>Date d'embauche :</strong> <?= $employee['hire_date'] ?></p>
+
+        <!-- bouton pour changer de departement by Harena-->
         <?php if ($current_dept): ?>
-        <p><strong>Département actuel :</strong>
-            <form action="employes_departement.php" method="get" class="d-inline">
-                <input type="hidden" name="dept_no" value="<?= $current_dept['dept_no'] ?>">
-                <button type="submit" class="btn btn-link p-0 m-0 align-baseline"><?= $current_dept['dept_name'] ?></button>
-            </form>
-        </p>
-        <?php endif; ?>
-        <?php if (!empty($data['longest_title'])): ?>
-        <p><strong>Emploi le plus long :</strong> 
-            <?= ($data['longest_title']['title']) ?> 
+        <p>
+            <strong>Département actuel :</strong> 
+            <?= $current_dept['dept_name'] ?> (depuis <?= $current_dept['from_date'] ?? 'date inconnue' ?>)
+            <button class="btn btn-sm btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#changeDeptModal">
+                Changer de département
+            </button>
         </p>
         <?php endif; ?>
     </div>
@@ -136,6 +153,54 @@ $current_dept = $data['current_dept'];
             </div>
         </footer>
     </div>
+
+    <!-- petit fenetre avec formulaire demander v4 pour changer de departement by Harena-->
+<div class="modal fade" id="changeDeptModal" tabindex="-1" aria-labelledby="changeDeptModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="changer_departement.php" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changeDeptModalLabel">Changer de département</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="emp_no" value="<?= $emp_no ?>">
+                    <?php if ($current_dept): ?>
+                    <input type="hidden" name="current_dept_no" value="<?= $current_dept['dept_no'] ?>">
+                    <input type="hidden" name="current_from_date" value="<?= $current_dept['from_date'] ?>">
+                    <div class="mb-3">
+                        <label class="form-label">Département actuel</label>
+                        <input type="text" class="form-control" value="<?= $current_dept['dept_name'] ?>" readonly>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <div class="mb-3">
+                        <label for="new_dept_no" class="form-label">Nouveau département</label>
+                        <select class="form-select" name="new_dept_no" id="new_dept_no" required>
+                            <option value="">Sélectionnez un département</option>
+                            <?php 
+                            $departments = getAllDepartments($dataBase);
+                            foreach ($departments as $dept): 
+                                if ($current_dept && $dept['dept_no'] === $current_dept['dept_no']) continue;
+                            ?>
+                            <option value="<?= $dept['dept_no'] ?>"><?= $dept['dept_name'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="from_date" class="form-label">Date de début</label>
+                        <input type="date" class="form-control" name="from_date" id="from_date" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
     <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>

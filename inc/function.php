@@ -103,6 +103,20 @@ function getFicheEmploye(mysqli $db, int $emp_no): array {
     } else {
         $dept_name = null;
     }
+    $current_dept_date = null;
+    if (isset($employee['dept_no'])) {
+        $date_result = mysqli_query($db, "
+            SELECT from_date 
+            FROM dept_emp 
+            WHERE emp_no = $emp_no 
+            AND dept_no = '{$employee['dept_no']}' 
+            AND to_date > NOW()
+            LIMIT 1
+        ");
+        if ($date_result && $date_row = mysqli_fetch_assoc($date_result)) {
+            $current_dept_date = $date_row['from_date'];
+        }
+    }
 
     return [
         'employee' => $employee,
@@ -111,6 +125,7 @@ function getFicheEmploye(mysqli $db, int $emp_no): array {
         'current_dept' => [
             'dept_no' => $dept_no,
             'dept_name' => $dept_name,
+            'from_date' => $current_dept_date,
         ],
         'longest_title' => $longest_title,
     ];
@@ -177,6 +192,80 @@ function getStatistiquesParEmploi(mysqli $db): array {
         $stats[] = $row;
     }
     return $stats;
+}
+
+function changerDepartementEmploye(mysqli $db, array $postData): array {
+
+    if (isset($postData['emp_no'])) {
+        $emp_no = $postData['emp_no'];
+    } else {
+        $emp_no = null;
+    }
+
+    if (isset($postData['new_dept_no'])) {
+        $new_dept_no = $postData['new_dept_no'];
+    } else {
+        $new_dept_no = null;
+    }
+
+    if (isset($postData['from_date'])) {
+        $from_date = $postData['from_date'];
+    } else {
+        $from_date = null;
+    }
+
+    if (isset($postData['current_dept_no'])) {
+        $current_dept_no = $postData['current_dept_no'];
+    } else {
+        $current_dept_no = null;
+    }
+
+    if (isset($postData['current_from_date'])) {
+        $current_from_date = $postData['current_from_date'];
+    } else {
+        $current_from_date = null;
+    }
+
+
+    if (!$emp_no || !$new_dept_no || !$from_date) {
+        $errors[] = 'Tous les champs sont obligatoires';
+    }
+
+    if ($current_from_date && strtotime($from_date) < strtotime($current_from_date)) {
+        $errors[] = 'La date de début ne peut pas être antérieure à la date actuelle (' . $current_from_date . ')';
+    }
+
+    if (!empty($errors)) {
+        return ['success' => false, 'errors' => $errors];
+    }
+
+
+    if ($current_dept_no) {
+        $update_current = mysqli_query($db, "
+            UPDATE dept_emp 
+            SET to_date = DATE_SUB('$from_date', INTERVAL 1 DAY)
+            WHERE emp_no = $emp_no 
+            AND dept_no = '$current_dept_no'
+            AND to_date > NOW()
+        ");
+        
+        if (!$update_current) {
+            $errors[] = 'Erreur lors de la mise à jour du département actuel';
+            return ['success' => false, 'errors' => $errors];
+        }
+    }
+
+    $insert_new = mysqli_query($db, "
+        INSERT INTO dept_emp (emp_no, dept_no, from_date, to_date)
+        VALUES ($emp_no, '$new_dept_no', '$from_date', '9999-01-01')
+    ");
+
+    if ($insert_new) {
+        return ['success' => true, 'message' => 'Département changé avec succès'];
+    } else {
+        $errors[] = 'Erreur lors du changement de département';
+        return ['success' => false, 'errors' => $errors];
+    }
 }
 
 
