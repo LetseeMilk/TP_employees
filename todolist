@@ -31,5 +31,10 @@ du début de l'actuel'
 
 --->test en changeant le departement de emp_no=29178 dans fiche employees php  (OK)
 
-2.
+2. Dans la fiche de l'employé, mettre un bouton "Devenir Manager". Cela va ouvrir un formulaire (Date
+de début).
+a. Vérifier dans la liste des départements qu'il est bien le nouveau manager
+b. Mettre en haut du formulaire le nom du manager en cours.
+c. Mettre un message de d'erreur si la date de début du nouveau manager est antérieur à la date du
+début de l'actuel
 
