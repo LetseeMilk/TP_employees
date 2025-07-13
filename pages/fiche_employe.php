@@ -219,7 +219,7 @@ $current_dept = $data['current_dept'];
                     <input type="hidden" name="dept_no" value="<?= $current_dept['dept_no'] ?>">
                     
                     <?php 
-                    // Récupérer le manager actuel
+                
                     $current_manager = getCurrentManager($dataBase, $current_dept['dept_no']);
                     ?>
                     
