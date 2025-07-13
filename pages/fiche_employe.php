@@ -70,6 +70,10 @@ $current_dept = $data['current_dept'];
             <button class="btn btn-sm btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#changeDeptModal">
                 Changer de département
             </button>
+            <!-- bouton pour devenir manager by Harena-->
+            <button class="btn btn-sm btn-info ms-2" data-bs-toggle="modal" data-bs-target="#becomeManagerModal">
+            Devenir Manager
+        </button>
         </p>
         <?php endif; ?>
     </div>
@@ -196,6 +200,47 @@ $current_dept = $data['current_dept'];
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                     <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="becomeManagerModal" tabindex="-1" aria-labelledby="becomeManagerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="devenir_manager.php" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="becomeManagerModalLabel">Devenir Manager</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="emp_no" value="<?= $emp_no ?>">
+                    <input type="hidden" name="dept_no" value="<?= $current_dept['dept_no'] ?>">
+                    
+                    <?php 
+                    // Récupérer le manager actuel
+                    $current_manager = getCurrentManager($dataBase, $current_dept['dept_no']);
+                    ?>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Manager actuel</label>
+                        <input type="text" class="form-control" 
+                               value="<?= $current_manager ? htmlspecialchars($current_manager['first_name'].' '.$current_manager['last_name']) : 'Aucun manager' ?>" 
+                               readonly>
+                        <?php if ($current_manager): ?>
+                        <small class="text-muted">En poste depuis <?= $current_manager['from_date'] ?></small>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="manager_from_date" class="form-label">Date de début</label>
+                        <input type="date" class="form-control" name="from_date" id="manager_from_date" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Confirmer</button>
                 </div>
             </form>
         </div>

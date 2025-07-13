@@ -268,5 +268,49 @@ function changerDepartementEmploye(mysqli $db, array $postData): array {
     }
 }
 
+function getCurrentManager(mysqli $db, string $dept_no): ?array {
+    $query = "SELECT e.first_name, e.last_name, dm.from_date 
+              FROM dept_manager dm
+              JOIN employees e ON dm.emp_no = e.emp_no
+              WHERE dm.dept_no = '$dept_no' 
+              AND dm.to_date > NOW()";
+    $result = mysqli_query($db, $query);
+    return mysqli_fetch_assoc($result) ?: null;
+}
+
+function devenirManager(mysqli $db, array $data): array {
+    // Validation
+    $errors = [];
+    if (empty($data['emp_no']) || empty($data['dept_no']) || empty($data['from_date'])) {
+        $errors[] = "Tous les champs sont obligatoires";
+        return ['success' => false, 'errors' => $errors];
+    }
+
+    $current_manager = getCurrentManager($db, $data['dept_no']);
+  
+    if ($current_manager && strtotime($data['from_date']) <= strtotime($current_manager['from_date'])) {
+        $errors[] = "La date doit être postérieure au ".$current_manager['from_date'];
+        return ['success' => false, 'errors' => $errors];
+    }
+
+    if ($current_manager) {
+        mysqli_query($db, "UPDATE dept_manager 
+                         SET to_date = DATE_SUB('{$data['from_date']}', INTERVAL 1 DAY)
+                         WHERE dept_no = '{$data['dept_no']}'
+                         AND to_date > NOW()");
+    }
+
+    $insert = mysqli_query($db, "INSERT INTO dept_manager 
+                               (emp_no, dept_no, from_date, to_date)
+                               VALUES ({$data['emp_no']}, '{$data['dept_no']}', 
+                               '{$data['from_date']}', '9999-01-01')");
+
+    if ($insert) {
+        return ['success' => true, 'message' => "Vous êtes maintenant manager de ce département"];
+    } else {
+        $errors[] = "Erreur lors de la mise à jour";
+        return ['success' => false, 'errors' => $errors];
+    }
+}
 
 ?>
